@@ -1,34 +1,48 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import CenterMessage from '../components/CenterMessage';
 import { colors } from '../theme';
 
-// Define the Countries component as a class
-export default class Countries extends React.Component {
-  render() {
-    const { countries } = this.props;
-    return (
-      <ScrollView contentContainerStyle={[!countries.length && { flex: 1 }]}>
-        {/* If no countries are available, center the message vertically */}
-        <View style={[!countries.length && { justifyContent: 'center', flex: 1 }]}>
-          {/* Show fallback message when no countries exist */}
-          {!countries.length && <CenterMessage message="No saved countries!" />}
+// Functional component to display the list of countries
+const Countries = ({ countries, navigation, addCurrencyInfo }) => {
+  
+  // Navigate to Country screen with required data
+  const navigateToCountry = useCallback((country) => {
+    navigation.navigate('Country', {
+      country,
+      countries,
+      addCurrencyInfo,
+    });
+  }, [countries, navigation, addCurrencyInfo]);
 
-          {/* Map through the countries list and render each country */}
-          {countries.map((item, index) => (
-            <View style={styles.countryContainer} key={index}>
+  return (
+    // Scrollable container for the countries list
+    <ScrollView contentContainerStyle={[!countries.length && { flex: 1 }]}>
+      <View style={[!countries.length && { justifyContent: 'center', flex: 1 }]}>
+        {/* Show message when no countries are available */}
+        {!countries.length && <CenterMessage message="No saved countries!" />}
+
+        {/* Render clickable list of countries */}
+        {countries.map((item, index) => (
+          <TouchableOpacity key={index} onPress={() => navigateToCountry(item)}>
+            <View style={styles.countryContainer}>
               <Text style={styles.country}>{item.country}</Text>
               <Text style={styles.currency}>{item.currency}</Text>
             </View>
-          ))}
-        </View>
-      </ScrollView>
-    );
-  }
-}
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
 
-
-// Define styles for the component
+// Styles for the Countries component
 const styles = StyleSheet.create({
   countryContainer: {
     padding: 10,
@@ -42,3 +56,5 @@ const styles = StyleSheet.create({
     color: 'rgba(0, 0, 0, .5)',
   },
 });
+
+export default Countries;
